@@ -1,0 +1,40 @@
+# =============================================================
+#  OdisseyRacha - MASCOTA DE RACHA
+# =============================================================
+#  Un Allay que sigue al jugador y muestra su racha.
+#  Se activa o quita desde el menu de una racha (clic en el huevo de Allay).
+#  Al hacer CLIC sobre la mascota se abre el menu de efectos de esa racha.
+#  Solo el dueño de la mascota y su amigo de racha pueden clicar.
+#
+#  Aqui puedes editar el TEXTO del holograma.
+
+mascota:
+  activado: true
+
+  # A que distancia a tu DERECHA flota la mascota (en bloques).
+  offset-derecha: 0.8
+  # Altura del Allay sobre tus pies (0.9 suele quedar a la altura del hombro).
+  altura: 0.9
+  # Altura del HOLOGRAMA por encima de la mascota (subelo si el texto choca).
+  holo-altura: 1.2
+  # Fondo del texto del holograma.
+  #   "transparente"  -> sin fondo (recomendado)
+  #   hex de 8 digitos ARGB (ej: "80000000" = negro semitransparente, "FF000000" = negro solido)
+  #   hex de 6 digitos RGB (ej: "000000" = negro solido)
+  holo-fondo: "transparente"
+  # Cuanto "sube y baja" flotando (0 = no flota). En bloques.
+  flotar: 0.12
+
+  # MEJORA: al llegar a estos dias de racha, el Allay desbloquea el ATACAR
+  # (golpea a lo mismo que golpea su dueño). El desbloqueo es PERMANENTE.
+  mejora:
+    dias-desbloqueo: 30
+    # Fraccion del dano del jugador que replica el Allay (0.5 = la mitad).
+    fraccion-dano: 0.5
+
+  # Texto del holograma. Placeholders:
+  #   %jugador% -> tu nombre   %amigo% -> el de tu amigo de racha
+  #   %dias%    -> dias de racha   %fuego% -> el emoji de abajo
+  fuego: "\uD83D\uDD25"
+  holo-titulo: "&6&lMascota de racha"
+  holo-linea: "&e%jugador% &7y &e%amigo% &7%fuego% &6%dias%"

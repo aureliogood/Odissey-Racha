@@ -1,0 +1,384 @@
+# =============================================================
+#  OdisseyRacha - amigos y rachas (estilo "racha de TikTok")
+# =============================================================
+#
+#  Como funciona:
+#   - Con /racha (o /amigos) se abre el menu.
+#   - Envias una solicitud de amistad; si la aceptan, ya sois amigos.
+#   - Con un amigo puedes "Solicitar racha". Si la acepta, se crea la racha.
+#   - La racha se mantiene SOLO si los DOS entran al servidor el mismo dia.
+#     Si un dia entra uno pero el otro no, la racha se pierde.
+#   - Cada dia que ambos entran, la racha sube 1. En ciertos dias da recompensas.
+
+# Version del config (informativo; las claves nuevas usan valores por defecto).
+config-version: 2
+
+# Zona horaria con la que se decide cuando cambia el dia (y cuando se rompe la
+# racha). Ejemplos: "America/Mexico_City", "America/Bogota", "Europe/Madrid".
+# Vacio = se usa la zona del servidor.
+zona-horaria: ""
+
+# Maximo de amigos por jugador.
+max-amigos: 20
+
+# Maximo de rachas activas por jugador (0 = sin limite).
+max-rachas: 3
+
+# Maximo de miembros por racha (2 = solo parejas; 3+ = rachas de grupo).
+max-miembros-racha: 6
+
+# Avisar por chat a los dos cuando la racha se alimenta o se pierde.
+avisar-al-perder: true
+avisar-al-subir: true
+
+# Al entrar, avisar si una racha sigue viva pero el otro aun no ha entrado hoy.
+avisar-al-entrar: true
+
+# Impide crear/ampliar rachas entre jugadores que comparten la misma IP
+# (evita multicuenta para farmear rachas). Se basa en la ultima IP registrada.
+anti-multicuenta: true
+
+# =============================================================
+#  HOLOGRAMA DEL TOP
+# =============================================================
+# Placeholders para un holograma con las mayores rachas (PlaceholderAPI):
+#   %odisseyracha_top%              -> TODAS las lineas de golpe (usa saltos de linea)
+#   %odisseyracha_top_<n>%          -> una linea (n = posicion, 1 = mejor)
+#   %odisseyracha_top_<n>_nombres%  -> solo los nombres
+#   %odisseyracha_top_<n>_dias%     -> solo los dias
+#   %odisseyracha_top_<n>_pos%      -> el numero de posicion
+#   %odisseyracha_top_<n>_miembros% -> cuantos miembros
+# En "formato" usa %pos%, %nombres%, %dias% y %miembros%.
+holograma:
+  cantidad: 10
+  formato: "&e%pos%. &f%nombres% &7- &e%dias% &7dias"
+  vacio: "&7Todavia no hay rachas."
+
+# =============================================================
+#  RECOMPENSAS
+# =============================================================
+# Por cada dia de racha que alcancen LOS DOS, se ejecuta lo que pongas aqui.
+# La clave es el numero de dias. Todos los premios van para los dos jugadores.
+#
+#   efectos  -> "TIPO:NIVEL:DURACION_SEGUNDOS"  (ej: SPEED:1:300 = Velocidad I 5 min)
+#   objetos  -> "MATERIAL:CANTIDAD"             (ej: DIAMOND:3)
+#   comandos -> comandos de consola. Placeholders: %player%, %jugador%, %amigo%, %dias%
+#
+recompensas:
+  3:
+    efectos:
+      - "SPEED:1:300"
+    objetos:
+      - "DIAMOND:3"
+    comandos:
+      - "say %jugador% y %amigo% llevan %dias% dias de racha!"
+  7:
+    efectos:
+      - "REGENERATION:1:600"
+    objetos:
+      - "DIAMOND:10"
+      - "GOLDEN_APPLE:2"
+    comandos:
+      - "say %jugador% y %amigo% llevan %dias% dias de racha!"
+  30:
+    efectos:
+      - "HASTE:2:900"
+    objetos:
+      - "NETHERITE_INGOT:1"
+    comandos:
+      - "say %jugador% y %amigo% han llegado a %dias% dias de racha!"
+
+# =============================================================
+#  RECUPERACION DE RACHA (estilo TikTok)
+# =============================================================
+# Cuando una racha se pierde, no muere del todo: queda "recuperable" durante
+# unas horas. Si uno de los dos pulsa "Recuperar" en el menu de la racha, se
+# le devuelven los dias. Cada jugador puede recuperar un numero limitado de
+# veces por racha: empieza en "base" y sube con los dias, hasta "maximo".
+recuperaciones:
+  activado: true
+  base: 3              # recuperaciones al empezar la racha
+  maximo: 6            # tope de recuperaciones
+  por-dias: 10         # +1 recuperacion cada X dias de racha
+  horas: 48            # horas para recuperarla (0 = sin limite)
+
+# =============================================================
+#  EFECTOS DEL MENU DE RACHA
+# =============================================================
+# Al clicar la cabeza de una racha se abre un menu con estos efectos.
+#   dias-minimos -> dias de racha necesarios para poder usarlo (0 = siempre)
+#   cooldown     -> segundos de espera entre usos de ESE efecto (0 = sin limite)
+#   efecto       -> "TIPO:NIVEL:DURACION_SEGUNDOS" (ej: SPEED:1:300)
+#   material     -> icono del item en el menu
+efectos-racha:
+  velocidad:
+    nombre: "&b&lVelocidad"
+    material: "SUGAR"
+    dias-minimos: 0
+    cooldown: 300
+    efecto: "SPEED:1:300"
+    lore:
+      - "&7Velocidad I durante 5 minutos"
+  fuerza:
+    nombre: "&c&lFuerza"
+    material: "BLAZE_POWDER"
+    dias-minimos: 3
+    cooldown: 300
+    efecto: "INCREASE_DAMAGE:1:300"
+    lore:
+      - "&7Fuerza I durante 5 minutos"
+  regeneracion:
+    nombre: "&d&lRegeneracion"
+    material: "GHAST_TEAR"
+    dias-minimos: 7
+    cooldown: 600
+    efecto: "REGENERATION:1:180"
+    lore:
+      - "&7Regeneracion I durante 3 minutos"
+  prisa:
+    nombre: "&e&lPrisa"
+    material: "GOLDEN_PICKAXE"
+    dias-minimos: 15
+    cooldown: 300
+    efecto: "HASTE:2:300"
+    lore:
+      - "&7Prisa II durante 5 minutos"
+
+# La mascota se configura en mascota.yml.
+
+# =============================================================
+#  BASE DE DATOS
+# =============================================================
+# tipo: yaml   -> guarda en plugins/OdisseyRacha/datos.yml (por defecto)
+#       mysql  -> MySQL/MariaDB
+#       sqlite -> archivo local plugins/OdisseyRacha/racha.db
+storage:
+  tipo: yaml
+  prefijo: odisseyracha_
+  mysql:
+    host: localhost
+    port: 3306
+    database: odisseyracha
+    user: root
+    password: ""
+
+# =============================================================
+#  MULTIPLICADOR DE RACHA
+# =============================================================
+# Multiplica la recompensa diaria segun los dias de racha. Coge el tramo mas
+# alto cuyo "dias" sea menor o igual que los dias actuales de la racha.
+multiplicador:
+  activado: true
+  tramos:
+    - dias: 0
+      multiplicador: 1.0
+    - dias: 7
+      multiplicador: 1.5
+    - dias: 30
+      multiplicador: 2.0
+    - dias: 100
+      multiplicador: 3.0
+
+# =============================================================
+#  ECONOMIA (necesita Vault)
+# =============================================================
+# Cada dia que la racha sube, se da esta cantidad de dinero a los DOS jugadores,
+# multiplicada por el multiplicador de arriba. Pon 0 para desactivarlo.
+economia:
+  activado: true
+  recompensa-diaria: 100.0
+
+# =============================================================
+#  DISCORD (webhook)
+# =============================================================
+# Pega aqui la URL del webhook de tu canal. Vacio = desactivado.
+# Placeholders: %jugador%, %amigo%, %dias%, %multiplicador%, %estado%
+discord:
+  webhook: ""
+  al-subir: true
+  al-perder: true
+  mensaje-subida: "🔥 %jugador% y %amigo% llevan %dias% dias de racha!"
+  mensaje-perdida: "💔 %jugador% y %amigo% han perdido su racha de %dias% dias (%estado%)."
+
+# =============================================================
+#  SONIDOS
+# =============================================================
+# Formato de cada sonido: "namespace:clave" o "namespace:clave;volumen;pitch".
+# Volumen y pitch son opcionales (0.0 - 1.0 / 0.5 - 2.0 aprox.).
+sonidos:
+  activado: true
+  abrir: "ui.button.click;0.6;1.2"
+  cerrar: "ui.button.click;0.5;0.9"
+  seleccionar: "ui.button.click;0.5;1.0"
+  volver: "ui.button.click;0.5;0.8"
+  exito: "entity.player.levelup;0.6;1.2"
+  error: "entity.villager.no;0.7;1.0"
+  aviso: "block.note_block.bell;0.6;1.4"
+  recuperar: "entity.player.levelup;0.8;1.4"
+  efecto: "entity.illusioner.cast_spell;0.7;1.2"
+  hito: "ui.toast.challenge_complete;0.8;1.0"
+  mascota: "entity.allay.ambient_with_item;0.7;1.3"
+
+# =============================================================
+#  MENSAJES
+# =============================================================
+mensajes:
+  prefix: "&8[&6Odissey &eRacha&8] &r"
+  solo-jugadores: "&cSolo un jugador puede hacer eso."
+  sin-permiso: "&cNo tienes permiso."
+  jugador-no-encontrado: "&cNo encuentro a ese jugador."
+  no-te-agregues: "&cNo puedes agregarte a ti mismo."
+  ya-amigos: "&cYa eres amigo de %jugador%."
+  ya-solicitud: "&eYa enviaste una solicitud a %jugador%."
+  limite-amigos: "&cHas alcanzado el limite de %max% amigos."
+  limite-rachas: "&cHas alcanzado el limite de %max% rachas."
+  limite-rachas-amigo: "&c%jugador% ya tiene el maximo de %max% rachas."
+  solicitud-enviada: "&aSolicitud enviada a &e%jugador%&a."
+  solicitud-recibida: "&e%jugador% &ate ha enviado una solicitud de amistad."
+  solicitud-aceptada: "&aAhora eres amigo de &e%jugador%&a."
+  solicitud-rechazada: "&7Rechazaste la solicitud de &e%jugador%&7."
+  sin-solicitud: "&c%jugador% no te ha enviado una solicitud."
+  no-son-amigos: "&cNo eres amigo de %jugador%."
+  amigo-eliminado: "&7Eliminaste a &e%jugador% &7de tus amigos."
+  racha-solicitud-enviada: "&aEnviaste una solicitud de racha a &e%jugador%&a."
+  racha-solicitud-recibida: "&e%jugador% &aquiere crear una racha contigo. Acepta en el menu (&e/racha&a)."
+  racha-ya-existe: "&eYa tienes una racha con %jugador%."
+  racha-creada: "&aRacha creada con &e%jugador%&a. Entren los dos cada dia para mantenerla."
+  racha-rechazada: "&7Rechazaste la racha con &e%jugador%&7."
+  racha-alimentada: "&aRacha con &e%jugador%&a: &e%dias% &adias. Mantenla manana."
+  racha-perdida: "&cHas perdido la racha con &e%jugador% &c(%dias% dias)."
+  racha-perdible: "&eHas perdido la racha con &6%jugador% &e(%dias% dias), pero aun puedes recuperarla desde el menu (&6/racha&e)."
+  racha-recuperada: "&a&lRacha recuperada&a con &e%jugador%&a: &e%dias% &adias de vuelta."
+  recuperar-no: "&cEsa racha no se puede recuperar (o ya no te quedan recuperaciones)."
+  efecto-desconocido: "&cEse efecto no existe."
+  efecto-sin-racha: "&cNo tienes una racha activa para usar ese efecto."
+  efecto-bloqueado: "&cNecesitas &e%dias% &cdias de racha (tienes &e%actual%&c)."
+  efecto-aplicado: "&aEfecto &e%efecto% &aaplicado."
+  efecto-cooldown: "&cDebes esperar &e%tiempo% &cpara volver a usar &e%efecto%&c."
+  economia-recompensa: "&6Recompensa de racha: &e+%cantidad% &6(&e%dias% &6dias, x&e%multiplicador%&6)."
+  mascota-desactivada: "&cLa mascota esta desactivada en este servidor."
+  mascota-sin-racha: "&cNo tienes una racha con ese jugador."
+  mascota-on: "&aMascota activada para tu racha con &e%jugador%&a."
+  mascota-off: "&7Mascota desactivada."
+  grupo-ya-miembro: "&e%jugador% &cya esta en esa racha."
+  grupo-lleno: "&cEsa racha ya tiene el maximo de miembros (&e%max%&c)."
+  grupo-conflicto: "&c%jugador% &cya comparte otra racha con uno de los miembros."
+  grupo-unido: "&e%jugador% &ase ha unido a la racha."
+  grupo-salida: "&e%jugador% &7ha salido de la racha."
+  grupo-salido: "&aHas salido de la racha."
+  multicuenta: "&cNo puedes hacer una racha con %jugador% (misma conexion)."
+  aviso-entrada-encabezado: "&6&lTus rachas de hoy:"
+  aviso-entrada-linea: "&8- &e%nombres% &7- &e%dias% &7dias &8(&a%entraron%&7/&f%total% &7hoy)"
+  aviso-entrada-vacio: "&7No tienes rachas activas. Crea una con &e/racha&7."
+  mejora-allay-desbloqueada: "&6&lMejora desbloqueada: &etu Allay ya ataca contigo&6 (racha de &e%dias% &6dias)!"
+  mejora-activada: "&aAtaque del Allay activado."
+  mejora-desactivada: "&7Ataque del Allay desactivado."
+  admin-usage: "&eUso: /racha admin dias add|remove|set <jugador> [jugadorB] <n> | /racha admin mejora <jugador> on|off | /racha admin reset <jugadorA> <jugadorB> | /racha admin rachas <jugador>"
+  admin-dias: "&aRacha de &e%jugador% &ay &e%amigo% &aahora tiene &e%dias% &adias."
+  admin-dias-jugador: "&aOperacion &e%dias% &aaplicada a &e%n% &aracha(s) de &e%jugador%&a."
+  admin-sin-rachas: "&c%jugador% no tiene ninguna racha."
+  admin-mejora-on: "&aMejora del Allay activada para &e%jugador%&a."
+  admin-mejora-off: "&cMejora del Allay desactivada para &e%jugador%&a."
+  admin-reset: "&aRacha de &e%jugador% &ay &e%amigo% &aeliminada."
+  admin-racha-no: "&cNo existe racha entre &e%jugador% &cy &e%amigo%&c."
+  admin-rachas: "&e%jugador% &atiene &e%n% &aracha(s)."
+  racha-riesgo: "&eRacha de &6%dias% &edias: falta la entrada de &6%jugador% &ehoy. Tienen hasta medianoche (&6%tiempo%&e) para no perderla."
+  racha-recompensa: "&6&lRecompensa &6por &e%dias% &6dias de racha con &e%jugador%&6!"
+  racha-estado-viva: "&aActiva"
+  racha-estado-riesgo: "&e&lEn riesgo"
+  racha-estado-perdida: "&6&lRecuperable"
+  racha-estado-rota: "&cPerdida"
+  top-vacio: "&7Todavia no hay rachas."
+  usage: "&eUso: /racha | /racha add <jugador> | /racha aceptar <jugador> | /racha rechazar <jugador> | /racha eliminar <jugador> | /racha racha <jugador> | /racha top | /racha help"
+  reload: "&aConfig recargada."
+
+# =============================================================
+#  MENUS (GUI)
+# =============================================================
+# Los menus llevan un marco decorativo: un BORDE de cristal coloreado y un
+# FONDO para los huecos. Cambia los materiales si quieres otro color.
+menus:
+  # Estilo general
+  marca: "&8&o@OdisseyMC"                    # linea de marca en el lore
+  item-click: "&e➤ &fHaz click"              # pista de click del lore
+  borde-material: "ORANGE_STAINED_GLASS_PANE"
+  relleno-material: "GRAY_STAINED_GLASS_PANE"
+  relleno-nombre: " "
+
+  # Titulos
+  titulo-principal: "&8»» &6&lAmigos y Rachas &8««"
+  titulo-amigos: "&8»» &6&lMis Amigos &8««"
+  titulo-solicitudes: "&8»» &6&lSolicitudes &8««"
+  titulo-anadir: "&8»» &6&lAñadir Amigo &8««"
+  titulo-rachas: "&8»» &6&lMis Rachas &8««"
+  titulo-amigo: "&8»» &6&lAmigo: &e%jugador% &8««"
+  titulo-racha: "&8»» &6&lRacha con &e%jugador% &8««"
+  titulo-invitar: "&8»» &6&lInvitar a la Racha &8««"
+
+  # Menu principal
+  item-amigos: "&e&l✦ Mis Amigos"
+  item-amigos-desc: "&7Gestiona tu lista de amigos y"
+  item-amigos-lore: "&7Amigos: &f%n%"
+  item-solicitudes: "&b&l✦ Solicitudes"
+  item-solicitudes-desc: "&7Acepta o rechaza las peticiones"
+  item-solicitudes-lore: "&7Pendientes: &f%n%"
+  item-anadir: "&a&l✦ Añadir Amigo"
+  item-anadir-desc: "&7Envía una solicitud a un jugador"
+  item-rachas: "&6&l✦ Mis Rachas"
+  item-rachas-desc: "&7Consulta tus rachas y su progreso"
+
+  # Genericos
+  item-volver: "&c&l← Volver"
+  item-cerrar: "&c&l✖ Cerrar"
+  vacio: "&8(vacío)"
+
+  # Lista de amigos
+  item-jugador-lore-amigo: "&7Racha: &f%dias% &7días"
+  item-jugador-lore-solicitar: "&e➤ &fHaz click para ver la racha"
+  item-jugador-lore-anadir: "&e➤ &fHaz click para enviar solicitud"
+  item-solicitud-lore: "&a➤ Izquierda: aceptar"
+  item-solicitud-lore-rechazar: "&c➤ Derecha: rechazar"
+
+  # Amigo (submenu)
+  item-solicitar-racha: "&a&lSolicitar Racha"
+  item-solicitar-racha-lore: "&7Crea una racha con este amigo"
+  item-eliminar-amigo: "&c&lEliminar Amigo"
+  item-eliminar-amigo-lore: "&7Elimina la amistad y la racha"
+
+  # Racha (submenu)
+  item-racha: "&6&lRacha con &e%jugador%"
+  item-racha-lore: "&7Días: &e%dias%"
+  item-racha-lore-miembros: "&7Miembros: &f%miembros%"
+  item-racha-lore-estado: "&7Estado: %estado%"
+  item-racha-lore-ultimo: "&7Último día juntos: &f%fecha%"
+  item-racha-lore-riesgo: "&7Alimentadla antes de medianoche: &f%tiempo%"
+  item-racha-lore-recuperable: "&7Puedes recuperarla durante: &f%tiempo%"
+  item-racha-lore-recuperaciones: "&7Recuperaciones: &f%restantes%&7/&f%max%"
+  item-racha-pendiente: "&e&l✦ Solicitud de Racha"
+  item-racha-pendiente-lore: "&7De: &f%jugador%"
+
+  # Efectos
+  item-efecto-lore-dias: "&7Necesitas &e%dias% &7días de racha"
+  item-efecto-lore-bloqueado: "&cNecesitas una racha activa para usar este efecto"
+  item-efecto-lore-usar: "&e➤ &aHaz click para activar"
+  item-efecto-lore-cooldown: "&cEn espera: &f%tiempo%"
+
+  # Recuperar
+  item-recuperar: "&6&l✦ Recuperar Racha"
+  item-recuperar-lore: "&7Recuperaciones: &f%restantes%&7/&f%max%"
+  item-recuperar-lore2: "&e➤ &aHaz click para recuperarla"
+
+  # Mascota y mejora
+  item-mascota-poner: "&d&l✦ Activar Mascota"
+  item-mascota-quitar: "&d&l✦ Quitar Mascota"
+  item-mascota-lore: "&7Un Allay que te sigue con vuestra racha"
+  item-mejora-poner: "&6&l✦ Activar ataque del Allay"
+  item-mejora-quitar: "&6&l✦ Desactivar ataque del Allay"
+  item-mejora-lore: "&7Tu Allay golpea lo mismo que tú (mitad de daño)"
+
+  # Grupo
+  item-invitar: "&a&l✦ Invitar a la Racha"
+  item-invitar-lore: "&7Añade a un amigo a esta racha (máx &f%max%&7)"
+  item-invitar-amigo-lore: "&e➤ &fHaz click para invitar"
+  item-salir-grupo: "&c&l✖ Salir de la Racha"
+  item-salir-grupo-lore: "&7Te saca de esta racha"

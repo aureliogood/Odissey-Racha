@@ -1,0 +1,29 @@
+name: OdisseyRacha
+version: 1.1.0
+main: es.odissey.racha.OdisseyRacha
+api-version: '1.21'
+author: ocampo05
+description: "Amigos y rachas estilo TikTok: menus, estados, recuperacion y mascota."
+
+# Vault (dinero) y PlaceholderAPI son opcionales: si estan, se usan.
+softdepend: [Vault, PlaceholderAPI]
+
+# Paper carga estos drivers para el plugin (necesarios en modo sqlite/mysql).
+libraries:
+  - org.xerial:sqlite-jdbc:3.49.1.0
+  - com.mysql:mysql-connector-j:9.3.0
+
+commands:
+  racha:
+    description: "Menu de amigos y rachas."
+    usage: "/racha [add|aceptar|rechazar|eliminar|racha|top|reload|help|admin]"
+    aliases: [amigos, amigo, rachas]
+    permission: odisseyracha.usar
+
+permissions:
+  odisseyracha.usar:
+    description: Permite abrir el menu de amigos/rachas y usar la racha.
+    default: true
+  odisseyracha.admin:
+    description: Permite recargar el config y ver el top.
+    default: op
